@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: triage_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=app/ml/weights/skin_cnn.pt
+      - ALLOWED_ORIGINS=http://localhost:3000
+    volumes:
+      - ./backend/app/ml/weights:/app/app/ml/weights
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: triage_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+    restart: on-failure
